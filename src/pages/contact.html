@@ -28,14 +28,14 @@ eleventyNavigation:
 <section id="cs-contact-242">
     <div class="cs-container">
         <div class="cs-content">
-            <span class="cs-topper">Here To Help</span>
-            <h2 class="cs-title">Get In Touch</h2>
-            <p class="cs-text">
-              Whether you’re interested in wind spinners, handmade jewelry, healing stones, or fossils, Alaskans Art-n-Around is here to bring peace and harmony through our unique creations.
+            <span class="cs-topper scroll-animate">Here To Help</span>
+            <h2 class="cs-title scroll-animate scroll-animate-delay-1">Get In Touch</h2>
+            <p class="cs-text scroll-animate scroll-animate-delay-2">
+              Whether you're interested in wind spinners, handmade jewelry, healing stones, or fossils, Alaskans Art-n-Around is here to bring peace and harmony through our unique creations.
             </p>
         </div>
         <!-- Form -->
-        <form id="cs-form-242" name="Contact Form" method="post" action="https://submit-form.com/VZvbNLFRK">
+        <form id="cs-form-242" name="Contact Form" method="post" action="https://submit-form.com/VZvbNLFRK" class="scroll-animate-left">
             <label class="cs-label">
                 Name
                 <input class="cs-input" required type="text" id="name-242" name="name" placeholder="John/Jane Doe">
@@ -50,13 +50,13 @@ eleventyNavigation:
             </label>
             <label class="cs-label cs-label-message">
                 Message
-                <textarea class="cs-input cs-textarea" required name="Message" id="message-242" placeholder="Hello, I’m interested in..."></textarea>
+                <textarea class="cs-input cs-textarea" required name="Message" id="message-242" placeholder="Hello, I'm interested in..."></textarea>
             </label>
             <button class="cs-button-solid cs-submit" type="submit">Submit Message Now</button>
         </form>
 
         <!-- Contact Info -->
-        <div class="cs-right-section">
+        <div class="cs-right-section scroll-animate-right">
             <ul class="cs-ul">
                 <li class="cs-li">
                     <picture class="cs-icon-wrapper">
@@ -87,3 +87,30 @@ eleventyNavigation:
         </div>
     </div>
 </section>
+
+<!-- Scroll Animations Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create intersection observer
+    const observerOptions = {
+      threshold: 0.1, // Trigger when 10% of element is visible
+      rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          // Stop observing once animated to improve performance
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all elements with scroll animation classes
+    const animatedElements = document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale');
+    animatedElements.forEach(element => {
+      observer.observe(element);
+    });
+  });
+</script>

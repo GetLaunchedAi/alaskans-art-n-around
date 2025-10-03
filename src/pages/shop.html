@@ -148,7 +148,7 @@ eleventyNavigation:
 <!-- ============================================ -->
   <div class="main-content">
   <!-- Products Header -->
-  <div class="products-header">
+  <div class="products-header scroll-animate">
     <h2 id="products-title">All Products <span id="products-count">(0)</span></h2>
     <div class="products-controls">
       <button id="hide-filters" class="hide-filters-btn">
@@ -178,7 +178,7 @@ eleventyNavigation:
   </div>
 
     <!-- Category Description -->
-    <div id="category-description" class="category-description" style="display: none;">
+    <div id="category-description" class="category-description scroll-animate" style="display: none;">
       <div class="category-info">
         <button id="back-to-category" class="back-button" style="display: none;">← Back to Category</button>
         <h3 id="category-title"></h3>
@@ -188,7 +188,7 @@ eleventyNavigation:
     </div>
 
   <!-- Products Grid -->
-<section id="catalog" class="grid" data-src="/products.json">
+<section id="catalog" class="grid scroll-animate" data-src="/products.json">
   <!-- Products will be loaded here -->
 </section>
 
@@ -878,4 +878,29 @@ eleventyNavigation:
   // Load products into the advanced filter system
   filterSystem.loadProducts();
 })();
+
+// Scroll Animations Script
+document.addEventListener('DOMContentLoaded', function() {
+  // Create intersection observer
+  const observerOptions = {
+    threshold: 0.1, // Trigger when 10% of element is visible
+    rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+  };
+  
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in');
+        // Stop observing once animated to improve performance
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+  
+  // Observe all elements with scroll animation classes
+  const animatedElements = document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale');
+  animatedElements.forEach(element => {
+    observer.observe(element);
+  });
+});
 </script>

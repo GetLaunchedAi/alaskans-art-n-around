@@ -16,15 +16,33 @@
     overflow: hidden;
     width: 100vw;
   }
-  #hero .cs-picture {
-    /* Background Image */
+  #hero .cs-slideshow {
     width: 100%;
     height: 100%;
-    display: block;
     position: absolute;
     top: 0;
     left: 0;
     z-index: -2;
+  }
+  
+  #hero .cs-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+  
+  #hero .cs-slide.cs-slide-active {
+    opacity: 1;
+  }
+  
+  #hero .cs-slide .cs-picture {
+    width: 100%;
+    height: 100%;
+    display: block;
     object-fit: cover;
   }
   #hero .cs-overlay {
@@ -41,15 +59,6 @@
     z-index: -1;
     /* prevents the cursor from interacting with it */
     pointer-events: none;
-  }
-  #hero .cs-picture video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    /* Makes image act like a background-image */
-    object-fit: cover;
   }
   #hero .cs-container {
     width: 100%;
@@ -250,6 +259,68 @@
 @media only screen and (min-width: 0em) {
   body.dark-mode #hero .cs-background:before {
     opacity: .8;
+  }
+}
+
+/*-- -------------------------- -->
+<---      Scroll Animations     -->
+<--- -------------------------- -*/
+/* Mobile - 360px */
+@media only screen and (min-width: 0em) {
+  .scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  
+  .scroll-animate.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .scroll-animate-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  
+  .scroll-animate-left.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .scroll-animate-right {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  
+  .scroll-animate-right.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .scroll-animate-scale {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  
+  .scroll-animate-scale.animate-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .scroll-animate-delay-1 {
+    transition-delay: 0.2s;
+  }
+  
+  .scroll-animate-delay-2 {
+    transition-delay: 0.4s;
+  }
+  
+  .scroll-animate-delay-3 {
+    transition-delay: 0.6s;
   }
 }
 /*-- -------------------------- -->

@@ -28,11 +28,11 @@ eleventyNavigation:
 <section id="sbs">
   <div class="cs-container">
     <!-- Left Image Section -->
-    <div class="cs-left">
-      {% image './src/images/about_img_0.png', 'laser cut stainless steel wind spinners and jewelry', 'cs-picture cs-picture1', 'lazy'%} 
+    <div class="cs-left scroll-animate-left">
+      {% image './src/images/about_img_0.jpg', 'laser cut stainless steel wind spinners and jewelry', 'cs-picture cs-picture1', 'lazy'%} 
     </div>
     <!-- Right Content Section-->
-    <div class="cs-right">
+    <div class="cs-right scroll-animate-right">
       <span class="cs-topper">About Us</span>
       <h2 class="cs-title">About Alaskans Art-n-Around</h2>
       <p class="cs-text">
@@ -40,12 +40,12 @@ eleventyNavigation:
         We journey across the U.S. in our RV, setting up at fairs and festivals to share a wide selection of artisan crafts — from mesmerizing laser-cut stainless steel wind spinners to healing stone jewelry, fossils, driftwood art, and handmade Navajo crafts. 
       </p>
       <p class="cs-text">
-        Our mission is to bring peace, tranquility, and harmony into people’s lives through unique products inspired by nature, the earth, and ancient traditions. We pride ourselves on offering one of the largest selections of high-quality wind spinners in the U.S., complete with spinning tails that captivate and calm. 
+        Our mission is to bring peace, tranquility, and harmony into people's lives through unique products inspired by nature, the earth, and ancient traditions. We pride ourselves on offering one of the largest selections of high-quality wind spinners in the U.S., complete with spinning tails that captivate and calm. 
       </p>
 
       <div class="cs-flex-group">
         <p class="cs-flex-p">
-          “We believe in connecting people with the earth’s beauty, history, and healing energy through carefully crafted art and jewelry.” 
+          "We believe in connecting people with the earth's beauty, history, and healing energy through carefully crafted art and jewelry." 
         </p>
         <span class="cs-name">Alaskans Art-n-Around</span>
         <span class="cs-job">Traveling Artisan Business</span>
@@ -70,12 +70,12 @@ eleventyNavigation:
 <section id="faq-326">
   <div class="cs-container">
     <div class="cs-content">
-      <span class="cs-topper">FAQs</span>
-      <h2 class="cs-title">Frequently Asked Questions</h2>
+      <span class="cs-topper scroll-animate">FAQs</span>
+      <h2 class="cs-title scroll-animate scroll-animate-delay-1">Frequently Asked Questions</h2>
     </div>
     <div class="cs-flex-group">
       <ul class="cs-faq-group">
-        <li class="cs-faq-item active">
+        <li class="cs-faq-item active scroll-animate scroll-animate-delay-1">
           <button class="cs-button">
             <span class="cs-button-text">
               What types of products do you offer?
@@ -85,7 +85,7 @@ eleventyNavigation:
             We carry laser-cut stainless steel wind spinners, jewelry made from semi-precious stones, fossils, driftwood and shell art, Navajo crafts, dream catchers, glass art, and more.
           </p>
         </li>
-        <li class="cs-faq-item">
+        <li class="cs-faq-item scroll-animate scroll-animate-delay-2">
           <button class="cs-button">
             <span class="cs-button-text">
               Where can I shop your products?
@@ -95,7 +95,7 @@ eleventyNavigation:
             We travel across the U.S. and set up at fairs and festivals. You can also explore our products online at <a href="https://alaskansartnaround.com">alaskansartnaround.com</a>.
           </p>
         </li>
-        <li class="cs-faq-item">
+        <li class="cs-faq-item scroll-animate scroll-animate-delay-3">
           <button class="cs-button">
             <span class="cs-button-text">
               What makes your business unique?
@@ -105,7 +105,7 @@ eleventyNavigation:
             Beyond our wide selection, we focus on creating peace and harmony through every product. Many of our items connect customers to the earth and ancient world — from mammoth ivory carvings to healing stones and fossils.
           </p>
         </li>
-        <li class="cs-faq-item">
+        <li class="cs-faq-item scroll-animate scroll-animate-delay-1">
           <button class="cs-button">
             <span class="cs-button-text">
               Do you make your own products?
@@ -136,15 +136,42 @@ eleventyNavigation:
 
 <section id="cta">
   <div class="container">
-    <h2 class="title">
+    <h2 class="title scroll-animate-scale">
       Bring Peace & Harmony Home <br />
       With Alaskans Art-n-Around
     </h2>
-    <p>
+    <p class="scroll-animate scroll-animate-delay-1">
       From wind spinners to fossils and jewelry, our artisan creations are made to inspire, heal, and connect. Discover the art that speaks to you today.
     </p>
-    <a href="/contact/" class="button-solid">Contact Us</a>
+    <a href="/contact/" class="button-solid scroll-animate scroll-animate-delay-2">Contact Us</a>
   </div>
   {% image './src/images/final_home_img.png', 'Alaskans Art-n-Around wind spinners and jewelry display', '', 'lazy',
   '(max-width: 400px) 400px, (max-width: 850px) 850px, 1920'%}
 </section>
+
+<!-- Scroll Animations Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create intersection observer
+    const observerOptions = {
+      threshold: 0.1, // Trigger when 10% of element is visible
+      rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          // Stop observing once animated to improve performance
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all elements with scroll animation classes
+    const animatedElements = document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale');
+    animatedElements.forEach(element => {
+      observer.observe(element);
+    });
+  });
+</script>

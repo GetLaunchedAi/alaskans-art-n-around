@@ -16,17 +16,17 @@ eleventyNavigation:
 <!-- ============================================ -->
 
 <section id="hero">
-  <video autoplay muted loop playsinline class="cs-picture">
-    <source
-      src="/images/hero_vid.mp4"
-      type="video/mp4"
-      autoplay
-      muted
-      loop
-      playsinline
-    />
-    Your browser does not support the video tag.
-  </video>
+  <div class="cs-slideshow">
+    <div class="cs-slide cs-slide-active">
+      <img src="/images/hero_img_0.png" alt="Alaskans Art-n-Around hero image 1" class="cs-picture" />
+    </div>
+    <div class="cs-slide">
+      <img src="/images/hero_img_1.png" alt="Alaskans Art-n-Around hero image 2" class="cs-picture" />
+    </div>
+    <div class="cs-slide">
+      <img src="/images/hero_img_2.png" alt="Alaskans Art-n-Around hero image 2" class="cs-picture" />
+    </div>
+  </div>
   <div class="cs-overlay"></div>
   <div class="cs-container">
     <div class="cs-flex-group">
@@ -59,7 +59,7 @@ eleventyNavigation:
 <!-- ============================================ -->
 
 <section id="services" class="services">
-  <div class="card">
+  <div class="card scroll-animate scroll-animate-delay-1">
     <picture>
       <img
         aria-hidden="true"
@@ -77,7 +77,7 @@ eleventyNavigation:
       captivate from afar.
     </p>
   </div>
-  <div class="card">
+  <div class="card scroll-animate scroll-animate-delay-2">
     <picture>
       <img
         aria-hidden="true"
@@ -95,7 +95,7 @@ eleventyNavigation:
       connection to nature.
     </p>
   </div>
-  <div class="card">
+  <div class="card scroll-animate scroll-animate-delay-3">
     <picture>
       <img
         aria-hidden="true"
@@ -121,10 +121,10 @@ eleventyNavigation:
 
 <section id="sbs">
   <div class="cs-container">
-    <div class="cs-left">
-      {% image './src/images/about_img_0.png', 'Alaskans Art-n-Around traveling booth', 'cs-picture cs-picture1', 'lazy'%}
+    <div class="cs-left scroll-animate-left">
+      {% image './src/images/about_img_0.jpg', 'Alaskans Art-n-Around traveling booth', 'cs-picture cs-picture1', 'lazy'%}
     </div>
-    <div class="cs-right">
+    <div class="cs-right scroll-animate-right">
       <span class="cs-topper">About Us</span>
       <h2 class="cs-title">About Alaskans Art-n-Around</h2>
       <p class="cs-text">
@@ -133,7 +133,7 @@ eleventyNavigation:
       </p>
       <p class="cs-text">
         Our mission is to share peace, tranquility, and harmony through our
-        products — whether it’s a dazzling wind spinner, a piece of ancient
+        products — whether it's a dazzling wind spinner, a piece of ancient
         fossil, or jewelry wrapped with love and care.
       </p>
       <div class="cs-flex-group">
@@ -164,10 +164,10 @@ eleventyNavigation:
 
 <section id="sbs-r">
   <div class="cs-container">
-    <div class="cs-left">
+    <div class="cs-left scroll-animate-right">
       {% image './src/images/featured_img_0.png', 'healing stone jewelry', 'cs-picture cs-picture1', 'lazy'%}
     </div>
-    <div class="cs-right">
+    <div class="cs-right scroll-animate-left">
       <span class="cs-topper">Our Collection</span>
       <h2 class="cs-title">Jewelry, Stones & Art</h2>
       <p class="cs-text">
@@ -190,14 +190,14 @@ eleventyNavigation:
 
 <section id="reviews">
   <div class="cs-container">
-    <span class="cs-topper">Our Customers</span>
-    <h2 class="cs-title">What People Say</h2>
-    <p class="cs-text">
-      Alaskans Art-n-Around delights visitors across the U.S. Here’s what our
+    <span class="cs-topper scroll-animate">Our Customers</span>
+    <h2 class="cs-title scroll-animate scroll-animate-delay-1">What People Say</h2>
+    <p class="cs-text scroll-animate scroll-animate-delay-2">
+      Alaskans Art-n-Around delights visitors across the U.S. Here's what our
       customers say about our products and shopping experience.
     </p>
     <ul class="cs-card-group">
-      <li class="cs-item">
+      <li class="cs-item scroll-animate scroll-animate-delay-1">
         <p class="cs-item-p">
           The wind spinners are absolutely mesmerizing! Everyone who sees mine
           is amazed.
@@ -217,7 +217,7 @@ eleventyNavigation:
           height="16"
         />
       </li>
-      <li class="cs-item">
+      <li class="cs-item scroll-animate scroll-animate-delay-2">
         <p class="cs-item-p">
           Their jewelry is stunning and carries such a peaceful energy. I wear
           mine every day!
@@ -247,15 +247,15 @@ eleventyNavigation:
 
 <section id="cta">
   <div class="container">
-    <h2 class="title">
+    <h2 class="title scroll-animate-scale">
       Discover Peace & Beauty <br />
       with Alaskans Art-n-Around
     </h2>
-    <p>
+    <p class="scroll-animate scroll-animate-delay-1">
       Ready to explore our handcrafted wind spinners, jewelry, and art? Shop
       online or visit us at fairs and festivals across the U.S.
     </p>
-    <a href="/contact/" class="button-solid">Contact Us</a>
+    <a href="/contact/" class="button-solid scroll-animate scroll-animate-delay-2">Contact Us</a>
   </div>
   {% image './src/images/final_home_img.png', 'wind spinners and jewelry display', '', 'lazy', '(max-width: 400px) 400px, (max-width: 850px) 850px, 1920px'%}
 </section>
@@ -271,4 +271,58 @@ eleventyNavigation:
       }
     });
   }
+</script>
+
+<!-- Hero Slideshow Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('#hero .cs-slide');
+    let currentSlide = 0;
+    
+    function showSlide(index) {
+      // Remove active class from all slides
+      slides.forEach(slide => slide.classList.remove('cs-slide-active'));
+      
+      // Add active class to current slide
+      slides[index].classList.add('cs-slide-active');
+    }
+    
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
+    
+    // Start the slideshow
+    if (slides.length > 0) {
+      showSlide(0); // Show first slide
+      setInterval(nextSlide, 4000); // Change slide every 4 seconds
+    }
+  });
+</script>
+
+<!-- Scroll Animations Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create intersection observer
+    const observerOptions = {
+      threshold: 0.1, // Trigger when 10% of element is visible
+      rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          // Stop observing once animated to improve performance
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all elements with scroll animation classes
+    const animatedElements = document.querySelectorAll('.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale');
+    animatedElements.forEach(element => {
+      observer.observe(element);
+    });
+  });
 </script>
