@@ -178,7 +178,7 @@ body.dark-mode{
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--card-radius);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: var(--shadow);
   transition: box-shadow .2s ease, transform .2s ease;
   position: relative;
@@ -240,56 +240,39 @@ body.dark-mode{
   color: var(--brand);
 }
 
-/* Tooltip for card titles */
-.card__title a::after {
-  content: attr(data-title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  pointer-events: none;
-  max-width: 300px;
-  word-wrap: break-word;
-  white-space: normal;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.card__title a::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(100%);
-  border: 5px solid transparent;
-  border-top-color: rgba(0, 0, 0, 0.9);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  pointer-events: none;
-}
-
-.card__title a:hover::after,
-.card__title a:hover::before {
-  opacity: 1;
-  visibility: visible;
-}
 
 .card__price{
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--price);
+}
+
+.card__description{
+  margin: 0.5rem 0 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.4;
+  
+  /* 3-line truncation with ellipsis */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  /* Fallback for browsers that don't support line-clamp */
+  max-height: calc(1.4em * 3); /* 3 lines * line-height */
+}
+
+/* Mobile: Show fewer lines for better mobile experience */
+@media (max-width: 768px) {
+  .card__description {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    max-height: calc(1.4em * 2); /* 2 lines on mobile */
+  }
 }
 
 /* Out of Stock Styles */
@@ -377,6 +360,8 @@ body.dark-mode{
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 16px;
+  position: relative;
+  z-index: 200001 !important;
 }
 
 .filter-toggle:hover {
@@ -398,7 +383,7 @@ body.dark-mode{
   height: 100vh;
   background: var(--bg);
   border-right: 1px solid var(--border);
-  z-index: 1000;
+  z-index: 200002 !important; /* Higher than filter toggle (200001) and mobile navbar (10000) */
   transform: translateX(-100%);
   transition: transform 0.3s ease;
   overflow-y: auto;
@@ -748,7 +733,7 @@ body.dark-mode{
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 200001 !important; /* Same as filter toggle, but overlay should be behind sidebar */
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -932,6 +917,7 @@ body.dark-mode{
     flex-shrink: 0;
     order: 1;
     overflow-x: hidden;
+    z-index: 1000 !important; /* Lower than desktop navbar (200000) */
   }
 
   .filter-close {
@@ -1004,12 +990,16 @@ body.dark-mode{
   .filter-toggle {
     display: flex;
     margin: 12px;
+    position: relative;
+    z-index: 200001 !important;
+    pointer-events: auto !important;
   }
 
   .filter-sidebar {
     position: fixed;
     width: 77.5%;
     transform: translateX(-100%);
+    z-index: 200002 !important; /* Higher than filter toggle (200001) and mobile navbar (10000) */
   }
 
   .filter-sidebar.open {
