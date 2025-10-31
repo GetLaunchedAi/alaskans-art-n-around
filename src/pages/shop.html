@@ -864,7 +864,7 @@ eleventyNavigation:
                   description: '${productDescription}',
                   price: ${p.price || 0},
                   currency: '${currency}'
-                }); if(typeof window.openCart === 'function') window.openCart(); return false;"`}>
+                }); return false;"`}>
           ${isOutOfStock ? 'Out of Stock' : 'Add to cart'}
         </button>
       </article>`;

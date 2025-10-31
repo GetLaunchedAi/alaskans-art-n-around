@@ -172,11 +172,6 @@
           price: finalPrice,
           currency: p.currency || 'USD'
         });
-        
-        // Optionally open cart after adding
-        if (typeof window.openCart === 'function') {
-          window.openCart();
-        }
       }
       
       return false;
@@ -229,7 +224,7 @@
                 description: '${esc(p.description || '')}',
                 price: ${p.price || 0},
                 currency: '${p.currency || 'USD'}'
-              }); if(typeof window.openCart === 'function') window.openCart(); return false;">
+              }); return false;">
         Add to cart
       </button>
     </article>`;

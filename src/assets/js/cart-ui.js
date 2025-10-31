@@ -558,7 +558,7 @@ function updateCheckoutTotals() {
           window.openModal({
             type: 'success',
             title: 'Payment Successful',
-            message: 'Thank you for your purchase. Your payment has been processed.',
+            message: 'Thank you for your order. Your payment has been processed.',
             details: paymentId ? `Transaction ID: ${paymentId}` : '',
             actions: [
               { label: 'Continue Shopping', variant: 'primary', onClick: () => { window.closeModal(); } }
