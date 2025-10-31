@@ -37,7 +37,7 @@
     state.product = p;
     state.base = Number(p.price ?? p.base_price ?? 0);
     render(p);
-    wireSnipcart(p);
+    wireAddToCartButton(p);
   }
 
   function fail(msg) {
@@ -139,42 +139,48 @@
 }
 
 
-  // Prepare the real Snipcart button: base price + deltas via custom fields
-  function wireSnipcart(p) {
-    const btn = $('#snipBtn');
+  // Wire up the add to cart button
+  function wireAddToCartButton(p) {
+    const btn = $('#addToCartBtn');
+    if (!btn) return;
 
-    // Build custom field definitions (with [+delta] so Snipcart computes price)
-    const opts = Array.isArray(p.options) ? p.options : [];
-    function syncButtonAttrs() {
-      btn.setAttribute('data-item-id', p.id || p.slug);
-      btn.setAttribute('data-item-name', p.title || p.name || p.slug);
-      btn.setAttribute('data-item-url', `/products/${encodeURIComponent(p.slug)}/`);
-      btn.setAttribute('data-item-image', p.image || '');
-      btn.setAttribute('data-item-description', p.description || '');
-      btn.setAttribute('data-item-price', Number(p.price ?? p.base_price ?? 0)); // base only
-
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Get selected options and calculate final price
+      const opts = Array.isArray(p.options) ? p.options : [];
+      let finalPrice = Number(p.price ?? p.base_price ?? 0);
+      
       opts.forEach((opt, i) => {
-        const idx = i + 1;
         const select = document.querySelector(`[data-opt-index="${i}"]`);
         const selected = select?.selectedOptions?.[0];
-        const selectedLabel = selected?.dataset.label || '';
-
-        const optionsStr = (Array.isArray(opt.values) ? opt.values : []).map(v => {
-          const label = v.label || v.value || v.id || '';
-          const d = Number(v.price_delta || 0);
-          return d ? `${label}[+${money(d)}]` : label;
-        }).join('|');
-
-        btn.setAttribute(`data-item-custom${idx}-name`, opt.name || `Option ${idx}`);
-        btn.setAttribute(`data-item-custom${idx}-options`, optionsStr);
-        if (selectedLabel) {
-          btn.setAttribute(`data-item-custom${idx}-value`, selectedLabel);
+        if (selected) {
+          const delta = Number(selected.dataset.delta || 0);
+          finalPrice += delta;
         }
       });
-    }
-    // Keep attributes in sync with current selections
-    $('#pdpOptions').addEventListener('change', syncButtonAttrs);
-    syncButtonAttrs();
+
+      // Add product to cart using the custom cart system
+      if (typeof window.addToCart === 'function' || typeof window.cart?.addToCart === 'function') {
+        const addToCartFn = window.addToCart || window.cart.addToCart;
+        addToCartFn({
+          id: p.id || p.slug,
+          title: p.title || p.name || p.slug,
+          image: p.image || '',
+          description: p.description || '',
+          price: finalPrice,
+          currency: p.currency || 'USD'
+        });
+        
+        // Optionally open cart after adding
+        if (typeof window.openCart === 'function') {
+          window.openCart();
+        }
+      }
+      
+      return false;
+    });
   }
 
   load();
@@ -209,13 +215,23 @@
 
   const card = p => `
     <article class="rel-card">
-      <a class="rel-card__img" href="${esc(productUrl(p))}">
+      <div class="rel-card__img">
         <img src="${esc(p.image || '/images/placeholder.jpg')}"
              alt="${esc(p.imageAlt || p.title || p.name || p.slug || 'Product')}" loading="lazy">
-      </a>
-      <h3 class="rel-card__title"><a href="${esc(productUrl(p))}">${esc(p.title || p.name || p.slug)}</a></h3>
+      </div>
+      <h3 class="rel-card__title">${esc(p.title || p.name || p.slug)}</h3>
       <div class="rel-card__price">$${money(p.price ?? p.base_price ?? 0)}</div>
-      <a class="rel-card__cta" href="${esc(productUrl(p))}">Add to cart</a>
+      <button class="rel-card__cta" type="button"
+              onclick="event.preventDefault(); event.stopPropagation(); (window.addToCart || window.cart?.addToCart)({
+                id: '${esc(p.id || p.slug)}',
+                title: '${esc(p.title || p.name || p.slug)}',
+                image: '${esc(p.image || '')}',
+                description: '${esc(p.description || '')}',
+                price: ${p.price || 0},
+                currency: '${p.currency || 'USD'}'
+              }); if(typeof window.openCart === 'function') window.openCart(); return false;">
+        Add to cart
+      </button>
     </article>`;
 
   function pickRelated(list, me, limit=20){

@@ -55,9 +55,17 @@
 
     <link rel="stylesheet" href="/css/root.css">
     <link rel="stylesheet" href="/css/dark.css">
-    <link rel="stylesheet" href="https://cdn.snipcart.com/themes/v3.6.0/default/snipcart.css" />
-    <script async src="https://cdn.snipcart.com/themes/v3.6.0/default/snipcart.js"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.snipcart.com/themes/v3.6.0/default/snipcart.css" /> -->
+    <!-- <script async src="https://cdn.snipcart.com/themes/v3.6.0/default/snipcart.js"></script> -->
     <link rel="preload" as="image" href="{{ preloadImg }}" />
+
+    <!-- Custom Cart System -->
+    <link rel="stylesheet" href="/css/cart.css" />
+    <script defer src="/assets/js/cart.js"></script>
+    <script defer src="/assets/js/cart-ui.js"></script>
+    <!-- in your base layout (e.g., src/_includes/layouts/base.njk) -->
+    <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+    <script defer src="/assets/js/square-pay.js"></script>
 
     <!-- Loading in page specific CSS sheets from css block -->
     <link rel="stylesheet" href="/css/critical.css" />

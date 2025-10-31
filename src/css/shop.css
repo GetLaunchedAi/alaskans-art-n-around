@@ -193,6 +193,7 @@ body.dark-mode{
   display: block;
   text-decoration: none;
   color: inherit;
+  cursor: default;
 }
 
 .card__img{
@@ -224,6 +225,12 @@ body.dark-mode{
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.3;
+}
+
+.card__title{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card__title a{
@@ -323,11 +330,19 @@ body.dark-mode{
   font-weight: 600;
   transition: all 0.2s ease;
   margin-top: auto;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
 }
 
-.add-to-cart:hover {
+.add-to-cart:hover:not(:disabled) {
   background-color: var(--primary);
   color: white;
+}
+
+.add-to-cart:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 

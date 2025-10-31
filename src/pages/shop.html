@@ -18,21 +18,8 @@ eleventyNavigation:
 
 <section id="int-hero">
     <h1 id="home-h">Our Products</h1>
-  <picture class="">
-    <source type="image/webp" srcset="/images/landing-200w.webp 200w, /images/landing-400w.webp 400w, /images/landing-850w.webp 850w, /images/landing-1920w.webp 1920w" sizes="(max-width: 400px) 400px,
-      (max-width: 850px) 850px,
-      1920px">
-    <source type="image/jpeg" srcset="/images/landing-200w.jpeg 200w, /images/landing-400w.jpeg 400w, /images/landing-850w.jpeg 850w, /images/landing-1920w.jpeg 1920w" sizes="(max-width: 400px) 400px,
-    (max-width: 850px) 850px,
-      1920px">
-    <img
-      src="/images/landing-200w.jpeg"
-      width="1920"
-      height="463"
-      alt="call center employees"
-      loading="lazy"
-      decoding="async">
-  </picture>
+    {% image './src/images/about_banner_img.png', 'Alaskans Art-n-Around artisan crafts display at a fair', '', 'lazy',
+  '(max-width: 850px) 850px, 1920px'%}
 </section>
 <!-- ============================================ -->
 <!--                Advanced Filter System        -->
@@ -849,26 +836,37 @@ eleventyNavigation:
 
   // Product card function
   function card(p) {
-    const href = productUrl(p);
     const img = p.image || '/images/placeholder.jpg';
     const title = esc(p.title || p.name || 'Untitled');
     const price = p.price ? money(p.price) : '0.00';
     const currency = p.currency || 'USD';
     const isOutOfStock = p.price === 0 || !p.inStock;
+    const productId = esc(p.id || p.slug || '');
+    const productTitle = esc(p.title || p.name || p.slug || '');
+    const productImage = esc(p.image || '');
+    const productDescription = esc(p.description || '');
     
     return `<article class="card ${isOutOfStock ? 'out-of-stock' : ''}">
-        <a href="${esc(href)}" class="card__link">
+        <div class="card__link">
           <picture class="card__img">
             <img src="${esc(img)}" alt="${esc(title)}" loading="lazy" decoding="async">
           </picture>
-        </a>
+        </div>
         <div class="card__content">
-          <h3 class="card__title">
-            <a href="${esc(href)}" data-title="${esc(title)}">${title}</a>
-          </h3>
+          <h3 class="card__title" data-title="${esc(title)}">${title}</h3>
           <p class="card__price">${isOutOfStock ? 'Out of Stock' : `$${price} ${currency}`}</p>
         </div>
-        <a class="add-to-cart ${isOutOfStock ? 'disabled' : ''}" href="${esc(href)}">${isOutOfStock ? 'Out of Stock' : 'Add to cart'}</a>
+        <button type="button" class="add-to-cart ${isOutOfStock ? 'disabled' : ''}" 
+                ${isOutOfStock ? 'disabled' : `onclick="event.preventDefault(); event.stopPropagation(); (window.addToCart || window.cart?.addToCart)({
+                  id: '${productId}',
+                  title: '${productTitle}',
+                  image: '${productImage}',
+                  description: '${productDescription}',
+                  price: ${p.price || 0},
+                  currency: '${currency}'
+                }); if(typeof window.openCart === 'function') window.openCart(); return false;"`}>
+          ${isOutOfStock ? 'Out of Stock' : 'Add to cart'}
+        </button>
       </article>`;
   }
 
