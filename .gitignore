@@ -2,3 +2,6 @@
 node_modules
 public
 .htaccess
+api/vendor
+api/process-payment.php
+assets/js/square-pay.js

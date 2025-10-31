@@ -62,6 +62,7 @@ ${Object.values(metadata)
   eleventyConfig.addPassthroughCopy('src/images');
   eleventyConfig.addPassthroughCopy({ 'src/admin': 'admin' }); // copies to /admin
   eleventyConfig.addPassthroughCopy({ 'src/_data/products.json': 'products.json' });
+  eleventyConfig.addPassthroughCopy('./api'); // copies api directory to /api
   eleventyConfig.addWatchTarget('src/_data/products.json');
 
   // Expose a dev flag to templates (true when running `eleventy --serve`)
