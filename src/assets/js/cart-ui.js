@@ -270,7 +270,10 @@ function updateCartTotals() {
 
 function updateCartIcon() {
   const cartIcon = document.querySelector('.cart-btn');
-  const badge = document.querySelector('.badge');
+  // Use more specific selector to find badge
+  const badge = document.querySelector('#navigation .cart-btn .badge') || 
+                document.querySelector('.cart-btn .badge') || 
+                document.querySelector('.badge');
   
   if (cartIcon) {
     cartIcon.setAttribute('type', 'button');
@@ -286,7 +289,8 @@ function updateCartIcon() {
     const display = count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : `${count}`;
 
     badge.textContent = count > 0 ? display : '';
-    badge.style.display = count > 0 ? 'block' : 'none';
+    // Use flex to match CSS - inline style overrides CSS :empty rule
+    badge.style.display = count > 0 ? 'flex' : 'none';
     badge.setAttribute('aria-label', count > 0 ? `${count} items in cart` : 'Cart is empty');
     badge.setAttribute('title', count > 0 ? `${count} items in cart` : 'Cart is empty');
   }
@@ -299,6 +303,49 @@ function handleCartIconClick(e) {
   toggleCart();
 }
 
+// ====== TOAST NOTIFICATION ======
+
+function showToast(message, type = 'success') {
+  // Remove existing toast if any
+  const existingToast = document.getElementById('cart-toast');
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.id = 'cart-toast';
+  toast.className = `cart-toast cart-toast--${type}`;
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'polite');
+  
+  toast.innerHTML = `
+    <div class="cart-toast__content">
+      <svg class="cart-toast__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      <span class="cart-toast__message">${message}</span>
+    </div>
+  `;
+
+  document.body.appendChild(toast);
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    toast.classList.add('cart-toast--show');
+  });
+
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove('cart-toast--show');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.remove();
+      }
+    }, 300); // Wait for fade-out animation
+  }, 3000);
+}
+
 // ====== EVENT HANDLERS ======
 
 function handleCheckout() {
@@ -306,7 +353,22 @@ function handleCheckout() {
   if (!cartUI.isInitialized) {
     initCartUI();
   }
-  const container = cartUI.sidebar || cartUI.overlay;
+  
+  // Reset form submission flag when opening checkout
+  checkoutFormSubmitted = false;
+  // Reset Square payment initialization flag so it can be initialized fresh
+  squarePaymentInitialized = false;
+  
+  // Use the appropriate container based on screen size (same logic as openCart)
+  let container;
+  if (window.innerWidth <= 768) {
+    // Mobile: Use overlay
+    container = cartUI.overlay;
+  } else {
+    // Desktop: Use sidebar
+    container = cartUI.sidebar;
+  }
+  
   if (!container) return;
 
   // Find the scrollable content area to host the checkout panel (keep footer pinned)
@@ -344,6 +406,13 @@ function setupCartEventListeners() {
     renderCartItems();
     updateCartTotals();
     updateCartIcon(); // Ensure cart icon is updated on every cart change
+  });
+  
+  // Listen for item added event to show toast
+  cart.addCartEventListener('itemAdded', (data) => {
+    const product = data.product;
+    const productTitle = product.title || product.name || 'Item';
+    showToast(`${productTitle} added to cart!`);
   });
   
   // Listen for window resize to handle mobile/desktop switching
@@ -445,13 +514,31 @@ function getCheckoutPanelHTML() {
       <div class="checkout-panel__section">
         <h4 class="checkout-panel__title">Contact & Shipping</h4>
         <div class="checkout-form">
-          <input id="co-name" class="checkout-input" type="text" placeholder="Full name" autocomplete="name">
-          <input id="co-email" class="checkout-input" type="email" placeholder="Email" autocomplete="email">
-          <input id="co-address" class="checkout-input" type="text" placeholder="Address" autocomplete="address-line1">
+          <div class="checkout-field">
+            <input id="co-name" class="checkout-input" type="text" placeholder="Full name" autocomplete="name" required>
+            <span class="checkout-error" id="co-name-error"></span>
+          </div>
+          <div class="checkout-field">
+            <input id="co-email" class="checkout-input" type="email" placeholder="Email" autocomplete="email" required>
+            <span class="checkout-error" id="co-email-error"></span>
+          </div>
+          <div class="checkout-field">
+            <input id="co-address" class="checkout-input" type="text" placeholder="Address" autocomplete="address-line1" required>
+            <span class="checkout-error" id="co-address-error"></span>
+          </div>
           <div class="checkout-row">
-            <input id="co-city" class="checkout-input" type="text" placeholder="City" autocomplete="address-level2">
-            <input id="co-state" class="checkout-input" type="text" placeholder="State" maxlength="2" autocomplete="address-level1">
-            <input id="co-zip" class="checkout-input" type="text" placeholder="ZIP" autocomplete="postal-code">
+            <div class="checkout-field">
+              <input id="co-city" class="checkout-input" type="text" placeholder="City" autocomplete="address-level2" required>
+              <span class="checkout-error" id="co-city-error"></span>
+            </div>
+            <div class="checkout-field">
+              <input id="co-state" class="checkout-input" type="text" placeholder="State" maxlength="2" autocomplete="address-level1" required>
+              <span class="checkout-error" id="co-state-error"></span>
+            </div>
+            <div class="checkout-field">
+              <input id="co-zip" class="checkout-input" type="text" placeholder="ZIP" autocomplete="postal-code" required>
+              <span class="checkout-error" id="co-zip-error"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -485,16 +572,214 @@ function attachCheckoutEventHandlers() {
   const inputs = ['co-name','co-email','co-address','co-city','co-state','co-zip']
     .map(id => document.getElementById(id))
     .filter(Boolean);
-  inputs.forEach(el => el.addEventListener('input', updateCheckoutTotals));
+  
+  // Add input filtering and total update listeners (no validation errors shown yet)
+  inputs.forEach(el => {
+    // Auto-uppercase state field
+    if (el.id === 'co-state') {
+      el.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+        // Only validate silently (no error display) until form is submitted
+        validateField(el.id, checkoutFormSubmitted);
+        updateCheckoutTotals();
+      });
+    } else if (el.id === 'co-zip') {
+      // Only allow digits and dash for ZIP code
+      el.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^\d-]/g, '');
+        // Only validate silently (no error display) until form is submitted
+        validateField(el.id, checkoutFormSubmitted);
+        updateCheckoutTotals();
+      });
+    } else {
+      el.addEventListener('input', () => {
+        // Only validate silently (no error display) until form is submitted
+        validateField(el.id, checkoutFormSubmitted);
+        updateCheckoutTotals();
+      });
+    }
+    // Validate on blur only if form has been submitted
+    el.addEventListener('blur', () => {
+      if (checkoutFormSubmitted) {
+        validateField(el.id, true);
+      }
+    });
+  });
 
   const cancelBtn = document.getElementById('co-cancel');
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
+      // Reset form submission flag
+      checkoutFormSubmitted = false;
+      // Reset Square payment initialization flag
+      squarePaymentInitialized = false;
       // Recreate containers and reopen cart to restore default view
       createCartSidebar();
       createCartOverlay();
       openCart();
     });
+  }
+}
+
+// ====== FORM VALIDATION ======
+
+// Track if user has attempted to submit the form
+let checkoutFormSubmitted = false;
+
+// Track if Square payment has been initialized to prevent multiple initializations
+let squarePaymentInitialized = false;
+
+function validateName(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return { valid: false, message: 'Full name is required' };
+  }
+  if (trimmed.length < 2) {
+    return { valid: false, message: 'Name must be at least 2 characters' };
+  }
+  if (!/^[a-zA-Z\s'-]+$/.test(trimmed)) {
+    return { valid: false, message: 'Name contains invalid characters' };
+  }
+  return { valid: true, message: '' };
+}
+
+function validateEmail(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return { valid: false, message: 'Email is required' };
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(trimmed)) {
+    return { valid: false, message: 'Please enter a valid email address' };
+  }
+  return { valid: true, message: '' };
+}
+
+function validateAddress(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return { valid: false, message: 'Address is required' };
+  }
+  if (trimmed.length < 5) {
+    return { valid: false, message: 'Address must be at least 5 characters' };
+  }
+  return { valid: true, message: '' };
+}
+
+function validateCity(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return { valid: false, message: 'City is required' };
+  }
+  if (trimmed.length < 2) {
+    return { valid: false, message: 'City must be at least 2 characters' };
+  }
+  return { valid: true, message: '' };
+}
+
+function validateState(value) {
+  const trimmed = (value || '').trim().toUpperCase();
+  if (!trimmed) {
+    return { valid: false, message: 'State is required' };
+  }
+  if (trimmed.length !== 2) {
+    return { valid: false, message: 'State must be 2 letters (e.g., CA, NY)' };
+  }
+  if (!/^[A-Z]{2}$/.test(trimmed)) {
+    return { valid: false, message: 'State must be 2 letters only' };
+  }
+  return { valid: true, message: '' };
+}
+
+function validateZip(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return { valid: false, message: 'ZIP code is required' };
+  }
+  const zipRegex = /^\d{5}(-\d{4})?$/;
+  if (!zipRegex.test(trimmed)) {
+    return { valid: false, message: 'ZIP code must be 5 digits (or 9 with dash)' };
+  }
+  return { valid: true, message: '' };
+}
+
+function validateField(fieldId, showErrors = false) {
+  const field = document.getElementById(fieldId);
+  const errorElement = document.getElementById(`${fieldId}-error`);
+  
+  if (!field || !errorElement) return false;
+  
+  const value = field.value;
+  let validation;
+  
+  switch(fieldId) {
+    case 'co-name':
+      validation = validateName(value);
+      break;
+    case 'co-email':
+      validation = validateEmail(value);
+      break;
+    case 'co-address':
+      validation = validateAddress(value);
+      break;
+    case 'co-city':
+      validation = validateCity(value);
+      break;
+    case 'co-state':
+      validation = validateState(value);
+      break;
+    case 'co-zip':
+      validation = validateZip(value);
+      break;
+    default:
+      return true;
+  }
+  
+  // Only show errors if form has been submitted or explicitly requested
+  const shouldShowErrors = showErrors || checkoutFormSubmitted;
+  
+  if (validation.valid) {
+    field.classList.remove('checkout-input--error');
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
+    return true;
+  } else {
+    if (shouldShowErrors) {
+      field.classList.add('checkout-input--error');
+      errorElement.textContent = validation.message;
+      errorElement.style.display = 'block';
+    }
+    return false;
+  }
+}
+
+function validateCheckoutForm() {
+  const fields = ['co-name', 'co-email', 'co-address', 'co-city', 'co-state', 'co-zip'];
+  let isValid = true;
+  
+  // Mark form as submitted so errors will be shown
+  checkoutFormSubmitted = true;
+  
+  fields.forEach(fieldId => {
+    if (!validateField(fieldId, true)) {
+      isValid = false;
+    }
+  });
+  
+  return isValid;
+}
+
+function showFirstError() {
+  const fields = ['co-name', 'co-email', 'co-address', 'co-city', 'co-state', 'co-zip'];
+  for (const fieldId of fields) {
+    const field = document.getElementById(fieldId);
+    const errorElement = document.getElementById(`${fieldId}-error`);
+    if (field && errorElement && errorElement.style.display === 'block') {
+      // Scroll field into view
+      field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      field.focus();
+      break;
+    }
   }
 }
 
@@ -538,18 +823,30 @@ function updateCheckoutTotals() {
   if (payBtn) {
     const labelAmount = `$${total.toFixed(2)}`;
     payBtn.textContent = total > 0 ? `Pay ${labelAmount}` : 'Pay Now';
+    // Only disable if total is 0 (don't validate form here to avoid showing errors prematurely)
     payBtn.disabled = !(total > 0);
   }
 
-  // Initialize/refresh Square payment binding
-  if (window.initSquareInlinePayment) {
+  // Initialize Square payment binding only once
+  if (window.initSquareInlinePayment && !squarePaymentInitialized) {
     const amountCents = Math.round(total * 100);
+    
+    // Validate form before allowing payment
+    const validateBeforePayment = () => {
+      if (!validateCheckoutForm()) {
+        showFirstError();
+        return false;
+      }
+      return true;
+    };
+    
     window.initSquareInlinePayment({
       amountCents,
       cardContainerSelector: '#card-container',
       payButtonSelector: '#card-button',
       statusSelector: '#payment-status',
       endpoint: '/api/process-payment.php',
+      beforeTokenize: validateBeforePayment,
           onSuccess: (data) => {
         if (typeof cart?.clearCart === 'function') cart.clearCart();
         closeCart();
@@ -584,5 +881,8 @@ function updateCheckoutTotals() {
         }
       }
     });
+    
+    squarePaymentInitialized = true;
   }
 }
+

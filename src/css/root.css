@@ -238,7 +238,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 10000;
+    z-index: 200003 !important;
     height: auto;
   }
 
@@ -373,6 +373,11 @@
     perspective: 700px;
   }
 
+  /* Hide ul when navbar menu is closed */
+  #navigation #navbar-menu:not(.open) ul {
+    display: none;
+  }
+
   #navigation #navbar-menu ul li {
     list-style: none;
     margin-bottom: 1.5rem;
@@ -429,7 +434,7 @@
     height: .5rem;
     background: var(--primary);
     opacity: 1;
-    bottom: 5rem;
+    bottom: 0;
     border-radius: .25rem;
     left: -.375rem;
     right: -.375rem;
@@ -438,9 +443,14 @@
 
   #navigation #navbar-menu.open {
     position: absolute;
-    height: 22.25rem;
+    /* height: 22.25rem; */
+    height: fit-content;
     padding-top: 1.25rem;
     z-index: 9999;
+  }
+
+  #navigation #navbar-menu.open ul {
+    display: block;
   }
 
   #navigation #navbar-menu.open ul li {
@@ -1272,4 +1282,63 @@ body.dark-mode #dark-mode-toggle .sun {
   body.dark-mode #footer {
     background: #061623;
   }
+}
+
+/* ============================================ */
+/*                  Toast Notification          */
+/* ============================================ */
+
+.cart-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 10000;
+  background: var(--primary);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(calc(100% + 2rem));
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.cart-toast--show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cart-toast__content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cart-toast__icon {
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.cart-toast__message {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .cart-toast {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
+  }
+}
+
+/* Dark mode support */
+body.dark-mode .cart-toast {
+  background: var(--primaryDark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

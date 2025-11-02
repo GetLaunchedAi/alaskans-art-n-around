@@ -398,7 +398,7 @@ body.dark-mode{
   height: 100vh;
   background: var(--bg);
   border-right: 1px solid var(--border);
-  z-index: 200002 !important; /* Higher than filter toggle (200001) and mobile navbar (10000) */
+  z-index: 200005 !important; /* Higher than filter toggle (200001) and mobile navbar (10000) */
   transform: translateX(-100%);
   transition: transform 0.3s ease;
   overflow-y: auto;
@@ -1014,7 +1014,7 @@ body.dark-mode{
     position: fixed;
     width: 77.5%;
     transform: translateX(-100%);
-    z-index: 200002 !important; /* Higher than filter toggle (200001) and mobile navbar (10000) */
+    z-index: 200005 !important; /* Higher than filter toggle (200001) and mobile navbar (10000) */
   }
 
   .filter-sidebar.open {

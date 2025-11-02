@@ -1,8 +1,8 @@
 // /src/assets/js/square-pay.js
 // Expose a global initializer to start Square payment with dynamic amount and selectors
 (function () {
-  const appId = "sandbox-sq0idb-gcWsDO_XVdN-VQxoPxS1iQ"; // Square sandbox App ID
-  const locationId = "LTT4WRVJPJD7K"; // Square sandbox Location ID
+  const appId = "sandbox-sq0idb-N4BxgtS-cEpyYmI6A6wBPA"; // Square sandbox App ID
+  const locationId = "L0A6VAJJW0G5D"; // Square sandbox Location ID
 
   async function initSquareInlinePayment(options) {
     const {
@@ -12,7 +12,8 @@
       statusSelector = "#payment-status",
       endpoint = "/api/process-payment.php",
       onSuccess,
-      onError
+      onError,
+      beforeTokenize
     } = options || {};
 
     const statusEl = document.querySelector(statusSelector);
@@ -36,7 +37,15 @@
     const payBtn = document.querySelector(payButtonSelector);
     if (!payBtn) return;
 
-    payBtn.addEventListener("click", async () => {
+    payBtn.addEventListener("click", async (e) => {
+      // Run beforeTokenize callback if provided (for form validation, etc.)
+      if (typeof beforeTokenize === 'function') {
+        const shouldProceed = beforeTokenize();
+        if (!shouldProceed) {
+          return; // Stop payment process if validation fails
+        }
+      }
+      
       payBtn.disabled = true;
       if (statusEl) statusEl.innerText = "Processing payment...";
       try {
